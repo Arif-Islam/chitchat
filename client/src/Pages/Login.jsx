@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlineGoogle } from "react-icons/ai";
+import { AiOutlineGoogle, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 const Login = () => {
+  const [eye, setEye] = useState(false);
+  const [passwordType, setPasswordType] = useState("password");
   const {
     register,
     handleSubmit,
@@ -43,15 +46,35 @@ const Login = () => {
           {errors.email?.type === "required" && (
             <span className="text-red-500 mb-2">Email is required!</span>
           )}
-          <input
-            className="w-80 h-11 rounded-sm p-2 bg-[#212121] text-gray-100 -ml-1 mb-3 focus:outline-none"
-            type="password"
-            {...register("password", {
-              required: true,
-              minLength: 6,
-            })}
-            placeholder="Password"
-          />
+          <div className="relative w-80 h-11 mx-auto mb-3">
+            <input
+              className="w-80 h-11 rounded-sm p-2 bg-[#212121] text-gray-100 -ml-1  focus:outline-none"
+              type={passwordType}
+              {...register("password", {
+                required: true,
+                minLength: 6,
+              })}
+              placeholder="Password"
+            />
+            {!eye && (
+              <AiFillEye
+                onClick={() => {
+                  setEye(true);
+                  setPasswordType("text");
+                }}
+                className="absolute left-[280px] bottom-[10px] w-6 h-6 hover:cursor-pointer"
+              ></AiFillEye>
+            )}
+            {eye && (
+              <AiFillEyeInvisible
+                onClick={() => {
+                  setEye(false);
+                  setPasswordType("password");
+                }}
+                className="absolute left-[280px] bottom-[10px] w-6 h-6 hover:cursor-pointer"
+              ></AiFillEyeInvisible>
+            )}
+          </div>
           {errors.password?.type === "minLength" && (
             <span className="text-red-500 mb-2">
               Minimum length of password is 6
@@ -63,7 +86,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-80 h-11 rounded-sm bg-blue-700 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-700 text-white text-[17px] font-semibold -ml-1 mb-4"
+            className="w-80 h-11 rounded-sm bg-blue-700 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-800 text-white text-[17px] font-semibold -ml-1 mb-4"
           >
             Login
           </button>
