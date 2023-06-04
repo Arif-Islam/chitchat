@@ -1,22 +1,51 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineGoogle, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { GiTalk } from "react-icons/gi";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [eye, setEye] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (formData) => {
+    setLoading(true);
+    try {
+      const data = await axios.post(
+        "http://localhost:5000/api/user/login",
+        formData,
+        {
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      toast.success("You've successfully logged in!");
+      localStorage.setItem("chitchatUserInfo", JSON.stringify(data));
+      setLoading(false);
+      navigate("/chats");
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      toast.error("Login failed!");
+      setLoading(false);
+    }
+    console.log(formData);
   };
 
   return (
-    <div className="text-white bg-[#0F1317] h-screen flex items-center justify-center">
+    <div className="text-white bg-[#0F1317] h-screen flex items-center justify-center relative">
       <div className="flex flex-col items-start justify-start">
         <h1 className="mb-[6px] tracking-wide text-3xl font-semibold">Login</h1>
         <p className="text-sm tracking-wide mb-4">
@@ -35,14 +64,9 @@ const Login = () => {
             type="email"
             {...register("email", {
               required: true,
-              pattern:
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             })}
             placeholder="Email"
           />
-          {errors.email?.type === "pattern" && (
-            <span className="text-red-500 mb-2">Please give a valid email</span>
-          )}
           {errors.email?.type === "required" && (
             <span className="text-red-500 mb-2">Email is required!</span>
           )}
@@ -62,7 +86,7 @@ const Login = () => {
                   setEye(true);
                   setPasswordType("text");
                 }}
-                className="absolute left-[280px] bottom-[10px] w-6 h-6 hover:cursor-pointer"
+                className="absolute left-[280px] bottom-[11px] w-[22px] h-[22px] hover:cursor-pointer"
               ></AiFillEye>
             )}
             {eye && (
@@ -71,7 +95,7 @@ const Login = () => {
                   setEye(false);
                   setPasswordType("password");
                 }}
-                className="absolute left-[280px] bottom-[10px] w-6 h-6 hover:cursor-pointer"
+                className="absolute left-[280px] bottom-[11px] w-[22px] h-[22px] hover:cursor-pointer"
               ></AiFillEyeInvisible>
             )}
           </div>
@@ -96,6 +120,12 @@ const Login = () => {
           <AiOutlineGoogle className="w-6 h-6"></AiOutlineGoogle>
           <p className="font-medium">Continue with Google</p>
         </div>
+      </div>
+      <div className="hidden md:block">
+        <p className="absolute top-4 right-10 flex items-center space-x-2">
+          <span>Welcome to chitchat</span>
+          <GiTalk className="w-6 h-6 mt-1"></GiTalk>
+        </p>
       </div>
     </div>
   );
