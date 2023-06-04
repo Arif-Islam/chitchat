@@ -1,19 +1,20 @@
 const express = require("express");
 const cors = require("cors");
-const chats = require("./data/data");
+const userRoutes = require("./routes/userRoutes");
+const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
-
 
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (req, res) => {
-    res.send("Route is working properly!");
-})
+app.use("/api/user", userRoutes);
 
-app.get("/api/chats", (req, res) => {
-    res.send(chats);
-})
+app.use(notFound);
+app.use(errorHandler);
+
+app.get("/", (req, res) => {
+  res.send("Route is working properly!");
+});
 
 module.exports = app;
