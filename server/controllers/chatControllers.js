@@ -50,3 +50,126 @@ exports.accessChat = async (req, res) => {
     }
   }
 };
+
+exports.fetchChats = async (req, res) => {
+  try {
+    Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password")
+      .populate("latestMessage")
+      .sort({ updatedAt: -1 })
+      .then(async (results) => {
+        results = await User.populate(results, {
+          path: "latestMessage.sender",
+          select: "name email",
+        });
+        res.status(200).send(results);
+      });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+};
+
+exports.createGroupChat = async (req, res) => {
+  if (!req.body.users || !req.body.name) {
+    return res
+      .status(400)
+      .send({ message: "Please add users to create a group." });
+  }
+
+  let users = JSON.parse(req.body.users);
+
+  if (users.length < 2) {
+    return res
+      .status(400)
+      .send("More than 2 users are required to form a group chat.");
+  }
+
+  users.push(req.user);
+  try {
+    const group = await Chat.create({
+      chatName: req.body.name,
+      users: users,
+      isGroupChat: true,
+      groupAdmin: req.user,
+    });
+
+    const groupChat = await Chat.findOne({ _id: group._id })
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
+
+    res.status(200).json(groupChat);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+};
+
+exports.renameGroup = async (req, res) => {
+  const { chatId, chatName } = req.body;
+  const updatedChat = await Chat.findByIdAndUpdate(
+    chatId,
+    { chatName: chatName },
+    { new: true }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!updatedChat) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(updatedChat);
+  }
+};
+
+exports.addToGroup = async (req, res) => {
+  const { chatId, userId } = req.body;
+
+  // here, i should check if the requester is an admin, will do it later or handle it from frontend
+
+  const added = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $push: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!added) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(added);
+  }
+};
+
+exports.removeFromGroup = async (req, res) => {
+  const { chatId, userId } = req.body;
+
+  // also here, i should check if the requester is an admin, will do it later or handle it from frontend
+
+  const removed = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $pull: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!removed) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(removed);
+  }
+};
