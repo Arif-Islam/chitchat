@@ -1,13 +1,10 @@
-
+import { useState } from "react";
+import { ChatState } from "../context/ChatProvider";
 
 const ChatPage = () => {
+  const { user } = ChatState();
 
-
-    return (
-        <div>
-            Chat page
-        </div>
-    );
+  return <div>{user && <p>Chats</p>}</div>;
 };
 
 export default ChatPage;

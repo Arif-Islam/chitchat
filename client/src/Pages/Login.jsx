@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineGoogle, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { GiTalk } from "react-icons/gi";
@@ -18,6 +18,13 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+//   useEffect(() => {
+//     const userInfo = JSON.parse(localStorage.getItem("chitchatUserInfo"));
+//     if (userInfo) {
+//       navigate("/chats");
+//     }
+//   }, [navigate]);
 
   const onSubmit = async (formData) => {
     setLoading(true);

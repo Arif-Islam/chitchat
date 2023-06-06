@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiFillEye, AiFillEyeInvisible, AiOutlineGoogle } from "react-icons/ai";
 import { GiTalk } from "react-icons/gi";
@@ -19,6 +19,13 @@ const Signup = () => {
     formState: { errors },
   } = useForm();
 
+  //   useEffect(() => {
+  //     const userInfo = JSON.parse(localStorage.getItem("chitchatUserInfo"));
+  //     if (userInfo) {
+  //       navigate("/chats");
+  //     }
+  //   }, [navigate]);
+
   const onSubmit = async (formData) => {
     setLoading(true);
     try {
@@ -36,7 +43,7 @@ const Signup = () => {
       localStorage.setItem("chitchatUserInfo", JSON.stringify(data));
       setLoading(false);
       navigate("/chats");
-    //   console.log(formData);
+      //   console.log(formData);
     } catch (error) {
       toast.error("Sign up failed!");
       setLoading(false);
