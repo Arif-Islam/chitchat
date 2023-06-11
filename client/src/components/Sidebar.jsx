@@ -27,7 +27,8 @@ const Sidebar = ({ user }) => {
               onMouseEnter={() => setProfileMenu(true)}
               onMouseLeave={() => setProfileMenu(false)}
               className="w-8 rounded-full hover:cursor-pointer"
-              src={user?.data?.image || user?.data?.data?.image}
+              //   src={user?.data?.image || user?.data?.data?.image}
+              src="https://res.cloudinary.com/dedukuyxr/image/upload/v1686518214/dkeavt4j6qtxutjgxsvi.png"
               alt=""
             />
             {profileMenu && (

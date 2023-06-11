@@ -5,6 +5,8 @@ import { GiTalk } from "react-icons/gi";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import UserProfileImage from "../components/UserProfileImage";
+import generateUserProfileImage from "../utils/GenerateUserProfileImage";
 
 const Signup = () => {
   const [eye, setEye] = useState(false);
@@ -27,6 +29,7 @@ const Signup = () => {
   //   }, [navigate]);
 
   const onSubmit = async (formData) => {
+    console.log(formData);
     setLoading(true);
     try {
       const { data } = await axios.post(
@@ -39,6 +42,9 @@ const Signup = () => {
         }
       );
 
+      if (formData.name) {
+        generateUserProfileImage(formData.name);
+      }
       toast.success("You've successfully signed up!");
       localStorage.setItem("chitchatUserInfo", JSON.stringify(data));
       setLoading(false);
