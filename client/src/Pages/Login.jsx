@@ -19,13 +19,6 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-//   useEffect(() => {
-//     const userInfo = JSON.parse(localStorage.getItem("chitchatUserInfo"));
-//     if (userInfo) {
-//       navigate("/chats");
-//     }
-//   }, [navigate]);
-
   const onSubmit = async (formData) => {
     setLoading(true);
     try {
@@ -48,7 +41,7 @@ const Login = () => {
       toast.error("Login failed!");
       setLoading(false);
     }
-    console.log(formData);
+    // console.log(formData);
   };
 
   return (
@@ -119,7 +112,18 @@ const Login = () => {
             type="submit"
             className="w-80 h-11 rounded-sm bg-blue-700 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-800 text-white text-[17px] font-semibold -ml-1 mb-4"
           >
-            Login
+            {!loading ? (
+              <p>Login</p>
+            ) : (
+              <div
+                className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] mt-1"
+                role="status"
+              >
+                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                  Loading...
+                </span>
+              </div>
+            )}
           </button>
         </form>
         <p className="w-full text-center mb-4">/</p>

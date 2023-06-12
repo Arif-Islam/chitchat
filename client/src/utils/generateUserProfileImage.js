@@ -1,4 +1,8 @@
 import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+// const navigate = useNavigate();
 
 function generateRandomColor() {
   const colors = [
@@ -47,8 +51,8 @@ function uploadImage(imageData) {
     });
 }
 
-const generateUserProfileImage = (name) => {
-  const initials = getUserInitials(name);
+export const generateUserProfileImage = async (formData) => {
+  const initials = getUserInitials(formData.name);
   const bgColor = generateRandomColor();
 
   const generateAndUploadImage = async () => {
@@ -67,10 +71,54 @@ const generateUserProfileImage = (name) => {
     const imageData = canvas.toDataURL("image/png");
     console.log(imageData);
     const uploadedImageUrl = await uploadImage(imageData);
-    console.log(uploadedImageUrl);
+    if (uploadedImageUrl) {
+      try {
+        const imageUrl = {
+          image: uploadedImageUrl,
+        };
+        const { data } = await axios.post(
+          "http://localhost:5000/api/user/signup",
+          { formData, imageUrl },
+          {
+            headers: {
+              "Content-type": "application/json",
+            },
+          }
+        );
+
+        toast.success("You've successfully signed up!");
+        localStorage.setItem("chitchatUserInfo", JSON.stringify(data));
+        // navigate("/chats");
+        window.location.href = "/chats";
+        console.log(formData);
+      } catch (error) {
+        toast.error("Sign up failed!");
+      }
+    }
+
+    // axios
+    //   .put(
+    //     "http://localhost:5000/api/user/update-image",
+    //     {
+    //       imageUrl: uploadedImageUrl,
+    //       email: email,
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     }
+    //   )
+    //   .then((response) => {
+    //     console.log(response);
+    //     return uploadedImageUrl;
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
   };
 
   generateAndUploadImage();
 };
 
-export default generateUserProfileImage;
+// export default generateUserProfileImage;

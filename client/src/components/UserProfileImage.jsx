@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
 import axios from "axios";
-
-const cloudinaryConfig = {
-  cloudName: "dedukuyxr",
-  uploadPreset: "chat-app",
-};
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function generateRandomColor() {
   const colors = [
@@ -32,7 +30,7 @@ function getUserInitials(name) {
   return initials;
 }
 
-function uploadImage(imageData) {
+async function uploadImage(imageData) {
   const url = `https://api.cloudinary.com/v1_1/dedukuyxr/image/upload`;
 
   const formData = new FormData();
@@ -51,74 +49,63 @@ function uploadImage(imageData) {
       console.error("Error uploading image to Cloudinary:", error);
       return "";
     });
-  //   fetch("https://api.cloudinary.com/v1_1/dedukuyxr/image/upload", {
-  //     method: "post",
-  //     body: formData,
-  //   })
-  //     .then((res) => console.log(res))
-  //     .then((data) => {
-  //       console.log(data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
 }
 
-const UserProfileImage = ({ name }) => {
-  const initials = getUserInitials(name);
-  const bgColor = generateRandomColor();
-  const [imageUrl, setImageUrl] = useState("");
+const UserProfileImage = ({ formData }) => {
+  // const [state, setState] = useState();
+  const navigate = useNavigate();
+
+  console.log(formData);
   useEffect(() => {
+    // console.log("formData.name", formData.name);
+    // const initials = getUserInitials(formData.name);
+    const bgColor = generateRandomColor();
     const generateAndUploadImage = async () => {
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
-      canvas.width = 100;
-      canvas.height = 100;
+      canvas.width = 50;
+      canvas.height = 50;
       context.fillStyle = bgColor;
       context.fillRect(0, 0, canvas.width, canvas.height);
-      context.font = "32px Arial";
+      context.font = "22px Arial";
       context.fillStyle = "#FFFFFF";
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillText(initials, canvas.width / 2, canvas.height / 2);
+      // context.fillText(initials, canvas.width / 2, canvas.height / 2);
 
       const imageData = canvas.toDataURL("image/png");
       console.log(imageData);
       const uploadedImageUrl = await uploadImage(imageData);
-      setImageUrl(uploadedImageUrl);
+      if (uploadedImageUrl) {
+        try {
+          const imageUrl = {
+            image: uploadedImageUrl,
+          };
+          const { data } = await axios.post(
+            "http://localhost:5000/api/user/signup",
+            { formData, imageUrl },
+            {
+              headers: {
+                "Content-type": "application/json",
+              },
+            }
+          );
+
+          toast.success("You've successfully signed up!");
+          localStorage.setItem("chitchatUserInfo", JSON.stringify(data));
+          navigate("/chats");
+          // window.location.href = "/chats";
+          console.log(formData);
+        } catch (error) {
+          toast.error("Sign up failed!");
+        }
+      }
     };
 
     generateAndUploadImage();
-  }, [initials, bgColor]);
-  return (
-    <>
-      <div>
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="User Profile"
-            style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-          />
-        ) : (
-          <div
-            style={{
-              backgroundColor: bgColor,
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#FFFFFF",
-              fontSize: "24px",
-            }}
-          >
-            {initials}
-          </div>
-        )}
-      </div>
-    </>
-  );
+  }, [formData, navigate]);
+
+  return <div></div>;
 };
 
 export default UserProfileImage;
