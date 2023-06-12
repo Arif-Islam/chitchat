@@ -3,7 +3,8 @@ const { generateToken } = require("../utils/generateToken");
 
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body.formData;
+    const { image } = req.body.imageUrl;
 
     if (!name || !email || !password) {
       res.status(400);
@@ -16,7 +17,7 @@ exports.registerUser = async (req, res) => {
       throw new Error("This user already exists!");
     }
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, email, password, image });
     if (user) {
       res.status(200).json({
         message: "user created successfully",
@@ -70,3 +71,4 @@ exports.allUsers = async (req, res) => {
   const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
   res.send(users);
 };
+
