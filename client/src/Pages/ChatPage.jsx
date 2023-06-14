@@ -11,11 +11,9 @@ const ChatPage = () => {
   console.log("user", user);
 
   return (
-    // <div style={{ backgroundImage: `url(${bgImg})`, backgroundSize: 'cover', backgroundPosition: "fixed", backgroundRepeat: "no-repeat" }} className="p-10">
     <div className="bg-gradient-to-r from-blue-950 via-purple-900 to-sky-950 p-10">
       <div className="flex items-center">
         <Sidebar user={user}></Sidebar>
-        {/* <div className="bg-black h-screen w-[2px]"></div> */}
         <Conversation></Conversation>
       </div>
     </div>

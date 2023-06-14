@@ -5,9 +5,6 @@ import { GiTalk } from "react-icons/gi";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { generateUserProfileImage } from "../utils/GenerateUserProfileImage";
-import UserProfileImage from "../components/UserProfileImage";
-// import generateUserProfileImage from "../utils/GenerateUserProfileImage";
 
 function generateRandomColor() {
   const colors = [
