@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv").config();
 const colors = require("colors");
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 5000;
 
 mongoose
   .connect(process.env.DATABASE_CONNECTION)

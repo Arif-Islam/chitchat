@@ -12,8 +12,8 @@ app.use(cors());
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 
-app.use(notFound);
-app.use(errorHandler);
+// app.use(notFound);
+// app.use(errorHandler);
 
 app.get("/", (req, res) => {
   res.send("Route is working properly!");

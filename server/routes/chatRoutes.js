@@ -10,7 +10,8 @@ const {
 } = require("../controllers/chatControllers");
 const router = express.Router();
 
-router.route("/").post(verifyJwt, accessChat).get(verifyJwt, fetchChats);
+router.route("/").get(verifyJwt, fetchChats);
+router.route("/").post(verifyJwt, accessChat);
 router.route("/create-group").post(verifyJwt, createGroupChat);
 router.route("/rename-group").put(verifyJwt, renameGroup);
 router.route("/add-to-group").put(verifyJwt, addToGroup);
