@@ -1,59 +1,12 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiFillEye, AiFillEyeInvisible, AiOutlineGoogle } from "react-icons/ai";
+import { AiOutlineGoogle, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { GiTalk } from "react-icons/gi";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-function generateRandomColor() {
-  const colors = [
-    "#FF5733",
-    "#C70039",
-    "#900C3F",
-    "#581845",
-    "#FFC300",
-    "#9ec754",
-    "#1287A5",
-    "#FF5733",
-    "#C70039",
-  ];
-  const randomIndex = Math.floor(Math.random() * colors.length);
-  return colors[randomIndex];
-}
-
-function getUserInitials(name) {
-  const words = name.split(" ");
-  const initials = words
-    .filter((word) => word.length > 0)
-    .map((word) => word[0].toUpperCase())
-    .slice(0, 2)
-    .join("");
-  return initials;
-}
-
-function uploadImage(imageData) {
-  const url = `https://api.cloudinary.com/v1_1/dedukuyxr/image/upload`;
-
-  const formData = new FormData();
-  formData.append("file", imageData);
-  formData.append("upload_preset", "chat-app");
-  formData.append("cloud_name", "dedukuyxr");
-
-  return axios
-    .post(url, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((response) => response.data.secure_url)
-    .catch((error) => {
-      console.error("Error uploading image to Cloudinary:", error);
-      return "";
-    });
-}
-
-const Signup = () => {
+const Login = ({ login, setLogin }) => {
   const [eye, setEye] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
   const [loading, setLoading] = useState(false);
@@ -68,65 +21,44 @@ const Signup = () => {
 
   const onSubmit = async (formData) => {
     setLoading(true);
-    if (formData.name && formData.email) {
-      const initials = getUserInitials(formData.name);
-      const bgColor = generateRandomColor();
-
-      const generateAndUploadImage = async () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        canvas.width = 50;
-        canvas.height = 50;
-        context.fillStyle = bgColor;
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.font = "22px Arial";
-        context.fillStyle = "#FFFFFF";
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillText(initials, canvas.width / 2, canvas.height / 2);
-
-        const imageData = canvas.toDataURL("image/png");
-        // console.log(imageData);
-        const uploadedImageUrl = await uploadImage(imageData);
-        if (uploadedImageUrl) {
-          try {
-            const imageUrl = {
-              image: uploadedImageUrl,
-            };
-            const { data } = await axios.post(
-              "http://localhost:5000/api/user/signup",
-              { formData, imageUrl },
-              {
-                headers: {
-                  "Content-type": "application/json",
-                },
-              }
-            );
-            setLoading(false);
-            toast.success("You've successfully signed up!");
-            localStorage.setItem("chitchatUserInfo", JSON.stringify(data));
-            navigate("/chats");
-          } catch (error) {
-            setLoading(false);
-            toast.error("Sign up failed!");
-          }
+    try {
+      const data = await axios.post(
+        "http://localhost:5000/api/user/login",
+        formData,
+        {
+          headers: {
+            "Content-type": "application/json",
+          },
         }
-      };
-
-      generateAndUploadImage();
+      );
+      toast.success("You've successfully logged in!");
+      localStorage.setItem("chitchatUserInfo", JSON.stringify(data));
+      setLoading(false);
+      navigate("/chats");
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      toast.error("Login failed!");
+      setLoading(false);
     }
+    // console.log(formData);
   };
+
   return (
     <div className="text-white bg-[#0F1317] h-screen flex items-center justify-center relative">
       <div className="flex flex-col items-start justify-start">
-        <h1 className="mb-[6px] tracking-wide text-3xl font-semibold">
-          Sign Up
-        </h1>
+        <h1 className="mb-[6px] tracking-wide text-3xl font-semibold">Login</h1>
         <p className="text-sm tracking-wide mb-4">
-          Have an account?{" "}
-          <a href="/" className="text-blue-500 hover:underline">
-            Login
-          </a>
+          New User?{" "}
+          {/* <a href="/signup" className="text-blue-500 hover:underline">
+            Sign Up
+          </a> */}
+          <span
+            onClick={() => setLogin(false)}
+            className="text-blue-500 hover:underline hover:cursor-pointer"
+          >
+            Sign Up
+          </span>
         </p>
 
         <form
@@ -135,28 +67,12 @@ const Signup = () => {
         >
           <input
             className="w-80 h-11 rounded-sm p-2 bg-[#212121] text-gray-100 -ml-1 mb-3 focus:outline-none"
-            type="text"
-            {...register("name", {
-              required: true,
-            })}
-            placeholder="Name"
-          />
-          {errors.name?.type === "required" && (
-            <span className="text-red-500 mb-2">Name is required!</span>
-          )}
-          <input
-            className="w-80 h-11 rounded-sm p-2 bg-[#212121] text-gray-100 -ml-1 mb-3 focus:outline-none"
             type="email"
             {...register("email", {
               required: true,
-              pattern:
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             })}
             placeholder="Email"
           />
-          {errors.email?.type === "pattern" && (
-            <span className="text-red-500 mb-2">Please give a valid email</span>
-          )}
           {errors.email?.type === "required" && (
             <span className="text-red-500 mb-2">Email is required!</span>
           )}
@@ -197,12 +113,13 @@ const Signup = () => {
           {errors.password?.type === "required" && (
             <span className="text-red-500 mb-2">Password is required!</span>
           )}
+
           <button
             type="submit"
             className="w-80 h-11 rounded-sm bg-blue-700 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-800 text-white text-[17px] font-semibold -ml-1 mb-4"
           >
             {!loading ? (
-              <p>Sign Up</p>
+              <p>Login</p>
             ) : (
               <div
                 className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite] mt-1"
@@ -231,4 +148,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;
